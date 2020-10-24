@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1073087632479",
+    "firebase_url": "https://myfirebasetest-68bab.firebaseio.com",
+    "project_id": "myfirebasetest-68bab",
+    "storage_bucket": "myfirebasetest-68bab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1073087632479:android:3ddd4cbf72803c1282b7ea",
+        "android_client_info": {
+          "package_name": "com.blackdragon.mytodolist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1073087632479-3h729ba40f7srjaqlf4bc3c24oamtn2a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXwhkAzOwyQUTRtAfsjVJet7iBqZg6Gl4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1073087632479-3h729ba40f7srjaqlf4bc3c24oamtn2a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
