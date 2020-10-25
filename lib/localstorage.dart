@@ -78,9 +78,7 @@ Future<List<Task>> readTasks() async {
       return [];
     }
 
-    List<Task> _tasks = jsonDecode(contents).map<Task>((item) => Task.fromJSON(item)).toList();
-
-    return _tasks;
+    return jsonDecode(contents).map<Task>((item) => Task.fromJSON(item)).toList();
   } catch (e) {
     print(e);
     // If encountering an error, return 0.

@@ -5,16 +5,38 @@ import 'package:mytodolist/classes/task.dart';
 import 'package:mytodolist/localstorage.dart';
 
 class TaskList extends StatefulWidget {
+  List<Task> _tasks = <Task>[];
+  bool asChild = false;
+
+  TaskList([this._tasks, this.asChild = false]);
+
   @override
-  _TaskListState createState() => _TaskListState();
+  _TaskListState createState() => _TaskListState(this._tasks, this.asChild);
 }
 
 class _TaskListState extends State<TaskList> {
   var _tasks = <Task>[];
   String _currText = '';
   bool init = true;
+  bool asChild = false;
 
-  List<Widget> _showTaskList() {
+  _TaskListState([List<Task> tasks, this.asChild]) : this._tasks = (tasks != null)? tasks : [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (!this.asChild) {
+      readTasks().then((tasks) {
+        setState(() {
+          _tasks = tasks;
+        });
+      });
+    } else {
+      _tasks = [];
+    }
+  }
+
+  List<Widget> _showTaskList(List<Task> _tasks) {
     List<Widget> taskList = [];
     for (int i = 0; i < _tasks.length; i++) {
       taskList.add(
@@ -82,23 +104,25 @@ class _TaskListState extends State<TaskList> {
 
   @override
   Widget build(BuildContext context) {
-    if (init) {
-      readTasks().then((tasks) {
-        setState(() {
-          _tasks = tasks;
-        });
-      });
-      init = false;
-    }
-    List<Widget> taskList = _showTaskList();
+    List<Widget> taskList = _showTaskList(_tasks);
     taskList.add(
       Container(
         child: ListTile(
           title: TextFormField(
-            decoration:
-                InputDecoration(filled: true, hintText: 'What you need to do?'),
+            decoration: InputDecoration(filled: true, hintText: 'Add a task!'),
             onChanged: (value) {
               _currText = value;
+            },
+            textInputAction: TextInputAction.done,
+            onEditingComplete: () {
+              setState(() {
+                if (this._currText != '') {
+                  _tasks.add(Task(this._currText));
+                  this._currText = '';
+                  saveTasks(_tasks);
+                  Navigator.of(context, rootNavigator: true).pop();
+                }
+              });
             },
           ),
           trailing: InkWell(

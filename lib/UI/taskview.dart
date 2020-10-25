@@ -22,6 +22,17 @@ class _TaskViewState extends State<TaskView> {
   _TaskViewState(this._tasks, this.idx) : _tempDesc = _tasks[idx].description;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    readTasks().then((tasks) {
+      setState(() {
+        _tasks = tasks;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
@@ -30,8 +41,10 @@ class _TaskViewState extends State<TaskView> {
             decoration: InputDecoration(filled: true),
             initialValue: _tasks[idx].description,
             onChanged: (value) {
-              _tempDesc = value;
-              _descEditing = true;
+              setState(() {
+                _tempDesc = value;
+                _descEditing = true;
+              });
             },
             keyboardType: TextInputType.multiline,
             maxLines: 4,

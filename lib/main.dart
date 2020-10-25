@@ -5,8 +5,11 @@
 import 'package:flutter/material.dart';
 import 'package:mytodolist/UI/calendar.dart';
 import 'package:mytodolist/UI/list.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  initializeDateFormatting().then((_) => runApp(MyApp()));
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -27,9 +30,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String _currentPage = 'list';
 
-  Widget _buildSuggestions() {
-    return TaskList();
+  Widget _body() {
+    switch(_currentPage) {
+      case 'list':
+        return TaskList();
+      case 'calendar':
+        return TaskCalendar();
+    }
   }
 
    Widget _drawer() {
@@ -65,6 +74,9 @@ class _HomePageState extends State<HomePage> {
               // Update the state of the app
               // ...
               // Then close the drawer
+              setState(() {
+                _currentPage = 'list';
+              });
               Navigator.pop(context);
             },
           ),
@@ -79,6 +91,9 @@ class _HomePageState extends State<HomePage> {
               // Update the state of the app
               // ...
               // Then close the drawer
+              setState(() {
+                _currentPage = 'calendar';
+              });
               Navigator.pop(context);
             },
           ),
@@ -94,7 +109,7 @@ class _HomePageState extends State<HomePage> {
         title: Text('My To Do List'),
       ),
       drawer: _drawer(),
-      body: _buildSuggestions(),
+      body: _body(),
     );
   }
 }
