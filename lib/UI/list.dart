@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:mytodolist/UI/task.dart';
+import 'package:mytodolist/UI/taskview.dart';
 import 'package:mytodolist/classes/task.dart';
 import 'package:mytodolist/localstorage.dart';
 
@@ -101,7 +101,7 @@ class _TaskListState extends State<TaskList> {
               _currText = value;
             },
           ),
-          trailing: GestureDetector(
+          trailing: InkWell(
             child: Container(
               child: Icon(Icons.add),
             ),

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 import 'package:mytodolist/classes/task.dart';
 import 'dart:io';
@@ -11,7 +12,7 @@ Future<String> get _localPath async {
 
 Future<File> _localFile(String filename) async {
   final path = await _localPath;
-  return File('$path/favourites.txt');
+  return File('$path/$filename');
 }
 
 Future<File> writeSListToFile(List<String> list, String filename) async {
@@ -52,11 +53,15 @@ Future<List> readSListFromFile(String filename) async {
 Future<File> saveTasks(List<Task> _tasks) async {
   final file = await _localFile('tasks.dat');
 
-  print(_tasks);
-  
-  final data = _tasks.join('\n');
+  if (_tasks == []) {
+    file.writeAsString('null');
+  }
 
-  print(data);
+  print("Tasks: "+_tasks.toString());
+  final json = _tasks.map((task) => task.toJSON()).toList();
+  print("JSON: "+json.toString());
+  
+  final data = jsonEncode(json);
 
   // Write the file.
   return file.writeAsString(data);
@@ -73,14 +78,7 @@ Future<List<Task>> readTasks() async {
       return [];
     }
 
-    List<String> list = contents.split('\n');
-
-    list.removeWhere((element) => element == '');
-
-    List<Task> _tasks = [];
-    for (var line in list) {
-      _tasks.add(Task.fromString(line));
-    }
+    List<Task> _tasks = jsonDecode(contents).map<Task>((item) => Task.fromJSON(item)).toList();
 
     return _tasks;
   } catch (e) {
