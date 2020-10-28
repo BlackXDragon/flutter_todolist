@@ -19,7 +19,9 @@ class _TaskViewState extends State<TaskView> {
   bool _descEditing = false;
   String _tempTagName = '';
 
-  _TaskViewState(this._tasks, this.idx) : _tempDesc = _tasks[idx].description;
+  _TaskViewState(this._tasks, this.idx) {
+    _tempDesc = _tasks[idx].description;
+  }
 
   @override
   void initState() {

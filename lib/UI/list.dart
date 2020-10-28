@@ -7,20 +7,32 @@ import 'package:mytodolist/localstorage.dart';
 class TaskList extends StatefulWidget {
   List<Task> _tasks = <Task>[];
   bool asChild = false;
+  DateTime defaultDeadline;
+  var onChange;
 
-  TaskList([this._tasks, this.asChild = false]);
+  TaskList(
+      [this._tasks,
+      this.asChild = false,
+      this.defaultDeadline,
+      this.onChange,
+      Key key])
+      : super(key: key);
 
   @override
-  _TaskListState createState() => _TaskListState(this._tasks, this.asChild);
+  _TaskListState createState() => _TaskListState(
+      this._tasks, this.asChild, this.defaultDeadline, this.onChange);
 }
 
 class _TaskListState extends State<TaskList> {
   var _tasks = <Task>[];
   String _currText = '';
-  bool init = true;
   bool asChild = false;
+  DateTime defaultDeadline;
+  var onChange;
 
-  _TaskListState([List<Task> tasks, this.asChild]) : this._tasks = (tasks != null)? tasks : [];
+  _TaskListState(
+      [List<Task> tasks, this.asChild, this.defaultDeadline, this.onChange])
+      : this._tasks = (tasks != null) ? tasks : [];
 
   @override
   void initState() {
@@ -31,19 +43,28 @@ class _TaskListState extends State<TaskList> {
           _tasks = tasks;
         });
       });
-    } else {
-      _tasks = [];
     }
+    // print(this.asChild);
+    // print(this._tasks);
+    // print(this.defaultDeadline);
   }
 
   List<Widget> _showTaskList(List<Task> _tasks) {
     List<Widget> taskList = [];
-    for (int i = 0; i < _tasks.length; i++) {
+    var toShow = (asChild)
+        ? _tasks.where((task) {
+            var _taskday = new DateTime.utc(
+                task.deadline.year, task.deadline.month, task.deadline.day, 12);
+            bool test = _taskday == defaultDeadline;
+            return (_taskday == defaultDeadline);
+          }).toList()
+        : _tasks;
+    for (int i = 0; i < toShow.length; i++) {
       taskList.add(
         Container(
           child: ListTile(
             title: Text(
-              _tasks[i].title,
+              toShow[i].title,
               style: TextStyle(
                 fontSize: 20.0,
               ),
@@ -64,7 +85,7 @@ class _TaskListState extends State<TaskList> {
             ),
             onTap: _showTask(i),
           ),
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          padding: EdgeInsets.symmetric(vertical: 2, horizontal: 2),
         ),
       );
     }
@@ -72,34 +93,55 @@ class _TaskListState extends State<TaskList> {
   }
 
   dynamic _showTask(int index) {
-    return () {
-      Navigator.of(context).push(
+    return () async {
+      var toShow = (asChild)
+          ? _tasks.where((task) {
+              var _taskday = new DateTime.utc(task.deadline.year,
+                  task.deadline.month, task.deadline.day, 12);
+              bool test = _taskday == defaultDeadline;
+              return (_taskday == defaultDeadline);
+            }).toList()
+          : _tasks;
+      var idx = _tasks.indexOf(toShow[index]);
+      await Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (BuildContext context) {
           return Scaffold(
             appBar: AppBar(
-              title: Text(_tasks[index].title),
+              title: Text(toShow[index].title),
             ),
-            body: TaskView(tasks: _tasks, index: index),
+            body: TaskView(tasks: _tasks, index: idx),
           );
         }),
       );
-      setState(() {
-        init = true;
-      });
+      if (asChild) {
+        this.onChange();
+      } else {
+        readTasks().then((tasks) {
+          setState(() {
+            _tasks = tasks;
+          });
+        });
+      }
     };
   }
 
   void _addTask() {
     if (_currText != '') {
-      setState(() => _tasks.add(Task(_currText)));
+      setState(() => _tasks.add(Task(_currText, deadline: defaultDeadline)));
       _currText = '';
       saveTasks(_tasks);
+      if (asChild) {
+        this.onChange();
+      }
     }
   }
 
   void _removeTask(int index) {
     setState(() => _tasks.removeAt(index));
     saveTasks(_tasks);
+    if (asChild) {
+      this.onChange();
+    }
   }
 
   @override
@@ -132,7 +174,7 @@ class _TaskListState extends State<TaskList> {
             onTap: _addTask,
           ),
         ),
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        padding: EdgeInsets.symmetric(vertical: 2, horizontal: 2),
       ),
     );
     return Container(

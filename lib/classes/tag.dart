@@ -35,6 +35,6 @@ class Tag {
   }
 
   String toString() {
-    return this.name + ',' + ((this.color != null)? this.color.toHex(): 'null');
+    return '<Tag ' + this.name + ',' + ((this.color != null)? this.color.toHex(): 'null') + '>';
   }
 }

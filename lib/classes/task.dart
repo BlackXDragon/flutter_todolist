@@ -33,7 +33,7 @@ class Task {
   }
 
   String toString() {
-    return this.title + ',' + this.description + ',' + this.deadline.toString() + ',' + this.tags.toString();
+    return '<Task ' + this.title + ',' + this.description + ',' + this.deadline.toString() + ',' + this.tags.toString() + '>';
   }
 
   static Task fromString(String taskstring) {

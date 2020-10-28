@@ -57,9 +57,9 @@ Future<File> saveTasks(List<Task> _tasks) async {
     file.writeAsString('null');
   }
 
-  print("Tasks: "+_tasks.toString());
+  // print("Tasks: "+_tasks.toString());
   final json = _tasks.map((task) => task.toJSON()).toList();
-  print("JSON: "+json.toString());
+  // print("JSON: "+json.toString());
   
   final data = jsonEncode(json);
 
