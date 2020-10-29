@@ -1,10 +1,13 @@
-import 'dart:convert';
-import 'package:path_provider/path_provider.dart';
+// import 'dart:convert';
+import 'package:localstorage/localstorage.dart';
+// import 'package:path_provider/path_provider.dart';
 import 'package:mytodolist/classes/task.dart';
-import 'dart:io';
+// import 'dart:io';
 import 'dart:async';
 
-Future<String> get _localPath async {
+final LocalStorage storage = new LocalStorage('mytodolist');
+
+/* Future<String> get _localPath async {
   final directory = await getApplicationDocumentsDirectory();
 
   return directory.path;
@@ -48,37 +51,22 @@ Future<List> readSListFromFile(String filename) async {
     // If encountering an error, return 0.
     return [];
   }
-}
+} */
 
-Future<File> saveTasks(List<Task> _tasks) async {
-  final file = await _localFile('tasks.dat');
-
-  if (_tasks == []) {
-    file.writeAsString('null');
-  }
-
+Future saveTasks(List<Task> _tasks) async {
+  while (! await storage.ready);
   // print("Tasks: "+_tasks.toString());
-  final json = _tasks.map((task) => task.toJSON()).toList();
+  final json = (_tasks != null)? _tasks.map((task) => task.toJSON()).toList() : [];
   // print("JSON: "+json.toString());
   
-  final data = jsonEncode(json);
-
-  // Write the file.
-  return file.writeAsString(data);
+  storage.setItem('tasks', json);
 }
 
 Future<List<Task>> readTasks() async {
   try {
-    final file = await _localFile('tasks.dat');
-
-    // Read the file.
-    String contents = await file.readAsString();
-
-    if (contents == "") {
-      return [];
-    }
-
-    return jsonDecode(contents).map<Task>((item) => Task.fromJSON(item)).toList();
+    while (! await storage.ready);
+    final raw = storage.getItem('tasks');
+    return (raw != null)? raw.map<Task>((item) => Task.fromJSON(item)).toList() : <Task>[];
   } catch (e) {
     print(e);
     // If encountering an error, return 0.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mytodolist/UI/list.dart';
+import 'package:mytodolist/UI/taskview.dart';
 import 'package:mytodolist/classes/task.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:mytodolist/localstorage.dart';
@@ -13,7 +14,8 @@ class _TaskCalendarState extends State<TaskCalendar>
     with TickerProviderStateMixin {
   CalendarController _calendarController;
   List<Task> _tasks = <Task>[];
-  DateTime _selectedDay = DateTime.utc(DateTime.now().year, DateTime.now().month, DateTime.now().day, 12);
+  DateTime _selectedDay = DateTime.utc(
+      DateTime.now().year, DateTime.now().month, DateTime.now().day, 12);
   // TaskList _taskList;
 
   CalendarBuilders calBuild = CalendarBuilders();
@@ -63,7 +65,7 @@ class _TaskCalendarState extends State<TaskCalendar>
         calBuild = CalendarBuilders(
           selectedDayBuilder: (context, date, _) {
             return Container(
-              margin: const EdgeInsets.all(4.0),
+              // margin: const EdgeInsets.all(4.0),
               // padding: const EdgeInsets.only(top: 5.0, left: 6.0),
               decoration: BoxDecoration(
                 border: Border.all(
@@ -81,7 +83,7 @@ class _TaskCalendarState extends State<TaskCalendar>
           },
           todayDayBuilder: (context, date, _) {
             return Container(
-              margin: const EdgeInsets.all(4.0),
+              // margin: const EdgeInsets.all(4.0),
               // padding: const EdgeInsets.only(top: 5.0, left: 6.0),
               color: Colors.lightBlue[400],
               width: 100,
@@ -173,31 +175,81 @@ class _TaskCalendarState extends State<TaskCalendar>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          TableCalendar(
-            locale: 'en_IN',
-            calendarController: _calendarController,
-            availableCalendarFormats: const {
-              CalendarFormat.month: 'Month',
-              CalendarFormat.week: 'Week',
-            },
-            events: _events,
-            holidays: {
-              DateTime(2020, 10, 30): ["Test Holiday"],
-            },
-            onDaySelected: _onDaySelected,
-            builders: calBuild,
-          ),
-          const SizedBox(
-            height: 8.0,
-          ),
-          Expanded(
-            child: TaskList(_tasks, true, _selectedDay, _onTaskChange, UniqueKey()),
-          ),
-        ],
-      ),
-    );
+    var viewsize = MediaQuery.of(context).size;
+    var height = viewsize.height, width = viewsize.width;
+    print("Height: $height, Width: $width");
+    if (viewsize.width < viewsize.height) {
+      print("Portrait");
+      return Container(
+        child: Column(
+          children: [
+            TableCalendar(
+              // rowHeight: 50.0,
+              locale: 'en_IN',
+              calendarController: _calendarController,
+              availableCalendarFormats: const {
+                CalendarFormat.month: 'Month',
+                CalendarFormat.week: 'Week',
+              },
+              events: _events,
+              onDaySelected: _onDaySelected,
+              builders: calBuild,
+            ),
+            const SizedBox(
+              height: 8.0,
+            ),
+            Expanded(
+              child: TaskList(
+                  _tasks, true, _selectedDay, _onTaskChange, UniqueKey()),
+            ),
+          ],
+        ),
+      );
+    } else {
+      print("Landscape");
+      return Container(
+        width: width,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: width / 2,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SingleChildScrollView(
+                    child: TableCalendar(
+                      // rowHeight: 100.0,
+                      locale: 'en_IN',
+                      calendarController: _calendarController,
+                      availableCalendarFormats: const {
+                        CalendarFormat.month: 'Month',
+                        CalendarFormat.week: 'Week',
+                      },
+                      events: _events,
+                      onDaySelected: _onDaySelected,
+                      builders: calBuild,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 8.0,
+                  ),
+                  Expanded(
+                    child: TaskList(
+                        _tasks, true, _selectedDay, _onTaskChange, UniqueKey()),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: width / 2,
+              child: (_tasks.length != 0)
+                  ? TaskView(tasks: _tasks, index: 0)
+                  : Container(),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

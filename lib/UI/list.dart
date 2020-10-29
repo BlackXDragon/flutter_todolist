@@ -53,6 +53,9 @@ class _TaskListState extends State<TaskList> {
     List<Widget> taskList = [];
     var toShow = (asChild)
         ? _tasks.where((task) {
+            if (task.deadline == null) {
+              return false;
+            }
             var _taskday = new DateTime.utc(
                 task.deadline.year, task.deadline.month, task.deadline.day, 12);
             bool test = _taskday == defaultDeadline;
@@ -156,16 +159,7 @@ class _TaskListState extends State<TaskList> {
               _currText = value;
             },
             textInputAction: TextInputAction.done,
-            onEditingComplete: () {
-              setState(() {
-                if (this._currText != '') {
-                  _tasks.add(Task(this._currText));
-                  this._currText = '';
-                  saveTasks(_tasks);
-                  Navigator.of(context, rootNavigator: true).pop();
-                }
-              });
-            },
+            onEditingComplete: _addTask,
           ),
           trailing: InkWell(
             child: Container(
