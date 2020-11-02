@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "myfirebasetest-68bab"
+  },
+  "targets": {
+    "myfirebasetest-68bab": {
+      "hosting": {
+        "todolist": [
+          "myquests"
+        ]
+      }
+    }
+  }
+}
