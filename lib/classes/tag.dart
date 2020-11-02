@@ -23,7 +23,7 @@ class Tag {
 
   Tag(this.name, {this.color});
 
-  Tag.fromJSON(Map<String, dynamic> json)
+  Tag.fromJSON(json)
     : name = json['name'],
       color = (json['color'] == 'null')? Colors.grey : HexColor.fromHex(json['color']);
 

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mytodolist/UI/home/calendar.dart';
 import 'package:mytodolist/UI/home/list.dart';
+import 'package:mytodolist/classes/task.dart';
+import 'package:mytodolist/classes/user.dart';
 import 'package:mytodolist/services/auth.dart';
+import 'package:mytodolist/services/firestore.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -11,6 +15,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String _currentPage = 'list';
   var _auth = AuthService();
+  User user;
 
   Widget _body() {
     switch(_currentPage) {
@@ -84,7 +89,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    user = Provider.of<User>(context);
+    return StreamProvider<List<Task>>.value(
+      value: DatabaseService(uid: user.uid).tasks,
+      child: Scaffold(
       appBar: AppBar(
         title: Text('My To Do List'),
         actions: [
@@ -96,6 +104,7 @@ class _HomePageState extends State<HomePage> {
       ),
       drawer: _drawer(),
       body: _body(),
+      ),
     );
   }
 }

@@ -13,7 +13,8 @@ class Task {
     this.tags = (tags != null) ? tags : [];
   }
 
-  Task.fromJSON(Map<String, dynamic> json) {
+  Task.fromJSON(json) {
+    // print("Task.fromJSON: $json");
     title = json['title'];
     description = json['description'];
     deadline =

@@ -2,7 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:mytodolist/UI/home/taskview.dart';
 import 'package:mytodolist/classes/task.dart';
+import 'package:mytodolist/classes/user.dart';
 import 'package:mytodolist/localstorage.dart';
+import 'package:mytodolist/services/firestore.dart';
+import 'package:provider/provider.dart';
 
 class TaskList extends StatefulWidget {
   List<Task> _tasks = <Task>[];
@@ -25,6 +28,7 @@ class TaskList extends StatefulWidget {
 
 class _TaskListState extends State<TaskList> {
   var _tasks = <Task>[];
+  User user;
   String _currText = '';
   bool asChild = false;
   DateTime defaultDeadline;
@@ -37,19 +41,15 @@ class _TaskListState extends State<TaskList> {
   @override
   void initState() {
     super.initState();
-    if (!this.asChild) {
-      readTasks().then((tasks) {
-        setState(() {
-          _tasks = tasks;
-        });
-      });
-    }
+    // if (!this.asChild) {
+    //   _tasks = Provider.of<List<Task>>(context);
+    // }
     // print(this.asChild);
     // print(this._tasks);
     // print(this.defaultDeadline);
   }
 
-  List<Widget> _showTaskList(List<Task> _tasks) {
+  List<Widget> _showTaskList() {
     List<Widget> taskList = [];
     var toShow = (asChild)
         ? _tasks.where((task) {
@@ -58,10 +58,11 @@ class _TaskListState extends State<TaskList> {
             }
             var _taskday = new DateTime.utc(
                 task.deadline.year, task.deadline.month, task.deadline.day, 12);
-            bool test = _taskday == defaultDeadline;
             return (_taskday == defaultDeadline);
           }).toList()
         : _tasks;
+    // print("Tasks: $_tasks");
+    // print("toShow: $toShow");
     for (int i = 0; i < toShow.length; i++) {
       taskList.add(
         Container(
@@ -119,11 +120,7 @@ class _TaskListState extends State<TaskList> {
       if (asChild) {
         this.onChange();
       } else {
-        readTasks().then((tasks) {
-          setState(() {
-            _tasks = tasks;
-          });
-        });
+        _tasks = Provider.of<List<Task>>(context);
       }
     };
   }
@@ -132,7 +129,7 @@ class _TaskListState extends State<TaskList> {
     if (_currText != '') {
       setState(() => _tasks.add(Task(_currText, deadline: defaultDeadline)));
       _currText = '';
-      saveTasks(_tasks);
+      DatabaseService(uid: user.uid).updateTasks(_tasks);
       if (asChild) {
         this.onChange();
       }
@@ -141,7 +138,7 @@ class _TaskListState extends State<TaskList> {
 
   void _removeTask(int index) {
     setState(() => _tasks.removeAt(index));
-    saveTasks(_tasks);
+    DatabaseService(uid: user.uid).updateTasks(_tasks);
     if (asChild) {
       this.onChange();
     }
@@ -149,7 +146,9 @@ class _TaskListState extends State<TaskList> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> taskList = _showTaskList(_tasks);
+    user = Provider.of<User>(context);
+    _tasks = Provider.of<List<Task>>(context) ?? [];
+    List<Widget> taskList = _showTaskList();
     taskList.add(
       Container(
         child: ListTile(
