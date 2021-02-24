@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mytodolist/UI/home/calendar.dart';
 import 'package:mytodolist/UI/home/list.dart';
 import 'package:mytodolist/classes/task.dart';
-import 'package:mytodolist/classes/user.dart';
+// import 'package:mytodolist/classes/user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mytodolist/services/auth.dart';
 import 'package:mytodolist/services/firestore.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   User user;
 
   Widget _body() {
-    switch(_currentPage) {
+    switch (_currentPage) {
       case 'list':
         return TaskList();
       case 'calendar':
@@ -26,7 +27,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-   Widget _drawer() {
+  Widget _drawer() {
     return Drawer(
       // Add a ListView to the drawer. This ensures the user can scroll
       // through the options in the drawer if there isn't enough vertical
@@ -93,17 +94,17 @@ class _HomePageState extends State<HomePage> {
     return StreamProvider<List<Task>>.value(
       value: DatabaseService(uid: user.uid).tasks,
       child: Scaffold(
-      appBar: AppBar(
-        title: Text('My To Do List'),
-        actions: [
-          MaterialButton(
-            child: Text("Logout"),
-            onPressed: () => _auth.signOut(),
-          )
-        ],
-      ),
-      drawer: _drawer(),
-      body: _body(),
+        appBar: AppBar(
+          title: Text('My To Do List'),
+          actions: [
+            MaterialButton(
+              child: Text("Logout"),
+              onPressed: () => _auth.signOut(),
+            )
+          ],
+        ),
+        drawer: _drawer(),
+        body: _body(),
       ),
     );
   }
